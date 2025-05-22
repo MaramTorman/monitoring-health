@@ -1,0 +1,69 @@
+version: '3.9'
+services:
+  mongo:
+    image: mongo:6
+    container_name: mongo_container
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - backend
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb_container
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    networks:
+      - backend
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=adminpass
+      - DOCKER_INFLUXDB_INIT_ORG=my-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=health_data
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=mytoken
+
+  neo4j:
+    image: neo4j:5
+    container_name: neo4j_container
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/testpass
+    volumes:
+      - neo4j_data:/data
+    networks:
+      - backend
+
+  cassandra:
+    image: cassandra:4.1
+    container_name: cassandra_container
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    networks:
+      - backend
+
+  redis:
+    image: redis:7
+    container_name: redis_container
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
+volumes:
+  mongo_data:
+  influxdb_data:
+  cassandra_data:
+  neo4j_data:
+
+networks:
+  backend:
+    driver: bridge
